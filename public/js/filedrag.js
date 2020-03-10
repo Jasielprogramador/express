@@ -6,8 +6,8 @@ function $id(id) {
 
 // output information
 function output(msg) {
-	const m = $id("messages");
-	m.innerHTML = msg + m.innerHTML;
+    const m = $id("messages");
+    m.innerHTML = msg + m.innerHTML;
 }
 
 
@@ -26,9 +26,9 @@ function fileSelectHandler(e) {
     fileDragHover(e);
 
     // fetch FileList object
-	const files = e.target.files || e.dataTransfer.files;
+    const files = e.target.files || e.dataTransfer.files;
 
-	if (e.constructor.name !== "DragEvent") {
+    if (e.constructor.name !== "DragEvent") {
         // process all File objects
         for (var i = 0, f; f = files[i]; i++) {
             parseFile(f);
@@ -37,8 +37,8 @@ function fileSelectHandler(e) {
 
     // files can be added by drag&drop or clicking on form's button
     // if the later, append files to form files field
-	const formFiles = $id("upload").fileselect;
-	if (formFiles.files.length === 0) {
+    const formFiles = $id("upload").fileselect;
+    if (formFiles.files.length === 0) {
         formFiles.files = files;
     }
 
@@ -67,18 +67,43 @@ function enviar() {
     // abrirse los ficheros) y los valores del resto de campos
     // HINT: https://stackoverflow.com/questions/36067767/how-do-i-upload-a-file-with-the-js-fetch-api
 
+    const inputFiles = document.querySelectorAll('input[type="file"]');
+    const formData = new FormData();
 
+    const fileInput = inputFiles[0].name;
+    for (const file of inputFiles[0].files) {
+        formData.append(fileInput, file);
+    }
+
+    let nombre = document.getElementById('nombre').value;
+    formData.append('name', nombre)
+
+    const url = '/pedidos/add';
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    }).then(resp => resp.json()).then(resp => {
+
+        [1,2].forEach( id => {
+            const irudia = `<img src='${resp[id].file}' width="100" height="100">`;
+            output(irudia);
+        });
+
+        output("Name:" + resp[0].name);
+        console.log(resp);
+
+    })
 }
 
 // initialize
 function init() {
 
-	const fileselect = $id("fileselect"),
-		filedrag = $id("filedrag"),
-		submitbutton = $id("enviar");
+    const fileselect = $id("fileselect"),
+        filedrag = $id("filedrag"),
+        submitbutton = $id("enviar");
 
 
-	submitbutton.onclick = enviar;
+    submitbutton.onclick = enviar;
 
 
     // file select
